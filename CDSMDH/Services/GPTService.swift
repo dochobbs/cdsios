@@ -4,19 +4,19 @@ import Foundation
 
 struct ClaudeConfiguration: Sendable {
     enum Model: String, CaseIterable, Identifiable, Codable {
-        case sonnet4 = "claude-sonnet-4-20250514"
-        case haiku4 = "claude-haiku-4-20250514"
+        case sonnet35 = "claude-3-5-sonnet-20241022"
+        case haiku35 = "claude-3-5-haiku-20241022"
 
-        static let `default`: Model = .sonnet4
+        static let `default`: Model = .sonnet35
 
         var id: String { rawValue }
 
         var displayName: String {
             switch self {
-            case .sonnet4:
-                return "Claude Sonnet 4.5 (Recommended)"
-            case .haiku4:
-                return "Claude Haiku 4 (Fast)"
+            case .sonnet35:
+                return "Claude 3.5 Sonnet (Recommended)"
+            case .haiku35:
+                return "Claude 3.5 Haiku (Fast)"
             }
         }
     }

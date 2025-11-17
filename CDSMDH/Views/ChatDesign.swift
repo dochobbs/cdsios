@@ -68,9 +68,9 @@ enum LakesBrand {
         .system(size: 13, weight: .regular, design: .default)
     }
 
-    /// Response - Monospace for clinical output
+    /// Response - Regular for clinical output
     static func response() -> Font {
-        .system(size: 10, weight: .regular, design: .monospaced)
+        .system(size: 12, weight: .regular, design: .default)
     }
 
     // MARK: - Spacing Tokens
@@ -211,6 +211,7 @@ struct StreamingOutputSection: View {
     let title: String
     let output: String
     let isStreaming: Bool
+    @State private var collapsedSections: Set<String> = []
 
     init(title: String = "Response", output: String, isStreaming: Bool) {
         self.title = title
@@ -237,19 +238,142 @@ struct StreamingOutputSection: View {
                         .fill(LakesBrand.darkNavy.opacity(0.2))
                 )
             } else {
-                ScrollView {
-                    Text(output)
-                        .font(LakesBrand.response())
-                        .foregroundStyle(.white)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .textSelection(.enabled)
-                        .padding(LakesBrand.spacingM)
+                VStack(spacing: 0) {
+                    if !isStreaming {
+                        HStack {
+                            Spacer()
+                            ShareLink(item: output) {
+                                Image(systemName: "square.and.arrow.up")
+                                    .font(.system(size: 14))
+                                    .foregroundStyle(LakesBrand.lightBlue)
+                            }
+                        }
+                        .padding(LakesBrand.spacingS)
+                    }
+
+                    ScrollView {
+                        if isStreaming {
+                            Text(output)
+                                .font(LakesBrand.response())
+                                .foregroundStyle(.white)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .textSelection(.enabled)
+                                .padding(LakesBrand.spacingM)
+                        } else {
+                            CollapsibleResponseView(text: output, collapsedSections: $collapsedSections)
+                                .padding(LakesBrand.spacingM)
+                        }
+                    }
+                    .frame(minHeight: 200)
                 }
-                .frame(minHeight: 200)
                 .background(
                     RoundedRectangle(cornerRadius: LakesBrand.radiusM, style: .continuous)
                         .fill(LakesBrand.darkNavy.opacity(0.3))
                 )
+            }
+        }
+    }
+}
+
+// MARK: - Collapsible Response View
+
+struct CollapsibleResponseView: View {
+    let text: String
+    @Binding var collapsedSections: Set<String>
+
+    private var sections: [(heading: String?, content: String)] {
+        parseSections(from: text)
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: LakesBrand.spacingS) {
+            ForEach(Array(sections.enumerated()), id: \.offset) { index, section in
+                if let heading = section.heading {
+                    CollapsibleSection(
+                        heading: heading,
+                        content: section.content,
+                        isCollapsed: collapsedSections.contains(heading)
+                    ) {
+                        if collapsedSections.contains(heading) {
+                            collapsedSections.remove(heading)
+                        } else {
+                            collapsedSections.insert(heading)
+                        }
+                    }
+                } else {
+                    Text(section.content)
+                        .font(LakesBrand.response())
+                        .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .textSelection(.enabled)
+                }
+            }
+        }
+    }
+
+    private func parseSections(from text: String) -> [(heading: String?, content: String)] {
+        var sections: [(heading: String?, content: String)] = []
+        let lines = text.components(separatedBy: .newlines)
+        var currentHeading: String?
+        var currentContent: [String] = []
+
+        for line in lines {
+            // Check if line is a heading (ALL CAPS with colons, or starts with ##)
+            if line.uppercased() == line && line.contains(":") && !line.isEmpty && line.count < 50 {
+                // Save previous section
+                if !currentContent.isEmpty {
+                    sections.append((heading: currentHeading, content: currentContent.joined(separator: "\n")))
+                    currentContent = []
+                }
+                currentHeading = line
+            } else if line.hasPrefix("## ") || line.hasPrefix("# ") {
+                // Markdown heading
+                if !currentContent.isEmpty {
+                    sections.append((heading: currentHeading, content: currentContent.joined(separator: "\n")))
+                    currentContent = []
+                }
+                currentHeading = line.replacingOccurrences(of: "# ", with: "").replacingOccurrences(of: "## ", with: "")
+            } else {
+                currentContent.append(line)
+            }
+        }
+
+        // Add final section
+        if !currentContent.isEmpty {
+            sections.append((heading: currentHeading, content: currentContent.joined(separator: "\n")))
+        }
+
+        return sections
+    }
+}
+
+struct CollapsibleSection: View {
+    let heading: String
+    let content: String
+    let isCollapsed: Bool
+    let onToggle: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: LakesBrand.spacingXS) {
+            Button(action: onToggle) {
+                HStack(spacing: LakesBrand.spacingS) {
+                    Image(systemName: isCollapsed ? "chevron.right" : "chevron.down")
+                        .font(.system(size: 10))
+                        .foregroundStyle(LakesBrand.lightBlue)
+                    Text(heading)
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(.white)
+                    Spacer()
+                }
+            }
+
+            if !isCollapsed {
+                Text(content)
+                    .font(LakesBrand.response())
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .textSelection(.enabled)
+                    .padding(.leading, 16)
             }
         }
     }
