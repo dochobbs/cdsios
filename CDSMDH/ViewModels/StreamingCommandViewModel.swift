@@ -7,7 +7,7 @@ class StreamingCommandViewModel: ObservableObject {
     @Published var isStreaming: Bool = false
     @Published var error: String?
 
-    private(set) var streamingTask: Task<Void, Never>?
+    internal var streamingTask: Task<Void, Never>?
 
     let commandKey: String
     let gptService: GPTService
@@ -70,7 +70,7 @@ class StreamingCommandViewModel: ObservableObject {
         isStreaming = false
     }
 
-    private func prepareConfiguration() -> ClaudeConfiguration? {
+    internal func prepareConfiguration() -> ClaudeConfiguration? {
         let configuration = settings.configuration()
         guard let apiKey = configuration.apiKey, !apiKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             error = "Add an Anthropic API key in Settings."

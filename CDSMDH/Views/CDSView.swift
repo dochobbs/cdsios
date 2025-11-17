@@ -81,8 +81,14 @@ struct CDSView: View {
 
                     StreamingOutputSection(
                         title: "Clinical Summary",
-                        output: viewModel.output,
-                        isStreaming: viewModel.isStreaming
+                        output: viewModel.displayOutput,
+                        isStreaming: viewModel.isStreaming,
+                        currentFormat: viewModel.format == .full ? "Quick" : "Full",
+                        isFetchingAlternate: viewModel.isFetchingAlternate,
+                        onToggleFormat: {
+                            let newFormat: CDSViewModel.ResponseFormat = viewModel.format == .full ? .quick : .full
+                            viewModel.toggleFormat(to: newFormat)
+                        }
                     )
                 }
                 .padding(.horizontal, LakesBrand.spacingM)

@@ -211,12 +211,26 @@ struct StreamingOutputSection: View {
     let title: String
     let output: String
     let isStreaming: Bool
+    let currentFormat: String?
+    let isFetchingAlternate: Bool
+    let onToggleFormat: (() -> Void)?
+
     @State private var collapsedSections: Set<String> = []
 
-    init(title: String = "Response", output: String, isStreaming: Bool) {
+    init(
+        title: String = "Response",
+        output: String,
+        isStreaming: Bool,
+        currentFormat: String? = nil,
+        isFetchingAlternate: Bool = false,
+        onToggleFormat: (() -> Void)? = nil
+    ) {
         self.title = title
         self.output = output
         self.isStreaming = isStreaming
+        self.currentFormat = currentFormat
+        self.isFetchingAlternate = isFetchingAlternate
+        self.onToggleFormat = onToggleFormat
     }
 
     var body: some View {
@@ -240,8 +254,27 @@ struct StreamingOutputSection: View {
             } else {
                 VStack(spacing: 0) {
                     if !isStreaming {
-                        HStack {
+                        HStack(spacing: LakesBrand.spacingM) {
+                            if let format = currentFormat, let toggle = onToggleFormat {
+                                Button(action: toggle) {
+                                    HStack(spacing: 4) {
+                                        if isFetchingAlternate {
+                                            ProgressView()
+                                                .scaleEffect(0.7)
+                                        } else {
+                                            Image(systemName: "arrow.left.arrow.right")
+                                                .font(.system(size: 12))
+                                        }
+                                        Text(format.uppercased())
+                                            .font(.system(size: 11, weight: .medium))
+                                    }
+                                    .foregroundStyle(LakesBrand.lightBlue)
+                                }
+                                .disabled(isFetchingAlternate)
+                            }
+
                             Spacer()
+
                             ShareLink(item: output) {
                                 Image(systemName: "square.and.arrow.up")
                                     .font(.system(size: 14))
