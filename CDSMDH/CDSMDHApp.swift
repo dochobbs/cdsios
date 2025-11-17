@@ -1,7 +1,7 @@
 import SwiftUI
 
 @main
-struct ClinicalAppApp: App {
+struct CDSMDHApp: App {
     @StateObject private var settings: SecureSettings
     @StateObject private var drugLookupViewModel: DrugLookupViewModel
     @StateObject private var cdsViewModel: CDSViewModel
