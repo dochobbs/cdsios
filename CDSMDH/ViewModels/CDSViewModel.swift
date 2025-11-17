@@ -79,6 +79,7 @@ final class CDSViewModel: StreamingCommandViewModel {
     }
 
     func toggleFormat(to newFormat: ResponseFormat) {
+        print("DEBUG toggleFormat: Switching to \(newFormat)")
         format = newFormat
 
         // Check if we already have this format cached
@@ -86,17 +87,23 @@ final class CDSViewModel: StreamingCommandViewModel {
         switch newFormat {
         case .full:
             cached = fullOutput
+            print("DEBUG: fullOutput cache exists: \(fullOutput != nil), length: \(fullOutput?.count ?? 0)")
         case .quick:
             cached = quickOutput
+            print("DEBUG: quickOutput cache exists: \(quickOutput != nil), length: \(quickOutput?.count ?? 0)")
         case .parent:
             cached = parentOutput
+            print("DEBUG: parentOutput cache exists: \(parentOutput != nil), length: \(parentOutput?.count ?? 0)")
         }
 
         if cached == nil, let presentation = lastPresentation {
             // Need to fetch this format
+            print("DEBUG: Cache miss, fetching format \(newFormat)")
             isFetchingAlternate = true
             let message = buildUserMessage(presentation: presentation, concerns: lastConcerns ?? "")
             streamToCache(message: message, format: newFormat)
+        } else if cached != nil {
+            print("DEBUG: Cache hit, using cached response")
         }
     }
 
@@ -130,20 +137,27 @@ final class CDSViewModel: StreamingCommandViewModel {
 
                 for try await chunk in stream {
                     try Task.checkCancellation()
+                    print("DEBUG ViewModel: Received chunk, length: \(chunk.count)")
                     // Ollama sends full accumulated message, not deltas
                     await MainActor.run {
+                        print("DEBUG ViewModel: Updating output on MainActor")
                         self.output = chunk
                         // Update cache in real-time for streaming display
                         switch format {
                         case .full:
                             self.fullOutput = chunk
+                            print("DEBUG: Updated fullOutput cache")
                         case .quick:
                             self.quickOutput = chunk
+                            print("DEBUG: Updated quickOutput cache")
                         case .parent:
                             self.parentOutput = chunk
+                            print("DEBUG: Updated parentOutput cache")
                         }
                     }
                 }
+
+                print("DEBUG ViewModel: Stream completed")
 
                 await MainActor.run {
                     self.isStreaming = false

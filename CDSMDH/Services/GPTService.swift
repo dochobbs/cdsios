@@ -119,11 +119,15 @@ actor GPTService {
                             let data = line.data(using: .utf8),
                             let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
                         else {
+                            print("DEBUG: Failed to parse JSON from line: \(line)")
                             continue
                         }
 
+                        print("DEBUG: Received chunk: \(String(describing: json))")
+
                         // Check if done
                         if let done = json["done"] as? Bool, done {
+                            print("DEBUG: Stream done")
                             break
                         }
 
@@ -132,6 +136,7 @@ actor GPTService {
                         if let message = json["message"] as? [String: Any],
                            let content = message["content"] as? String,
                            !content.isEmpty {
+                            print("DEBUG: Yielding content length: \(content.count)")
                             continuation.yield(content)
                         }
                     }
