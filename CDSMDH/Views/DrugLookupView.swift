@@ -12,7 +12,7 @@ struct DrugLookupView: View {
                 VStack(spacing: LakesBrand.spacingM) {
                     GlassCard(
                         title: "Drug Lookup",
-                        subtitle: "Weight-based dosing powered by GPT-5.1",
+                        subtitle: "Weight-based dosing powered by Claude",
                         icon: "pills.circle.fill"
                     ) {
                         VStack(spacing: LakesBrand.spacingM) {

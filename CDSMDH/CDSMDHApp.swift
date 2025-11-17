@@ -4,10 +4,10 @@ import SwiftUI
 /*
  IMPORTANT: PRIVACY AND DATA TRANSMISSION DISCLOSURE
 
- This application transmits clinical information to OpenAI's API for processing.
+ This application transmits clinical information to Anthropic's Claude API for processing.
 
  Healthcare organizations using this app must ensure:
- 1. A valid Business Associate Agreement (BAA) is in place with OpenAI
+ 1. A valid Business Associate Agreement (BAA) is in place with Anthropic
  2. Users are informed about data transmission to third-party services
  3. Appropriate consent is obtained before transmitting patient information
  4. All usage complies with HIPAA, state privacy laws, and organizational policies

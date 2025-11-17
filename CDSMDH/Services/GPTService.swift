@@ -1,20 +1,22 @@
 import Foundation
 
-struct GPTConfiguration: Sendable {
-    enum Model: String, CaseIterable, Identifiable, Codable {
-        case gpt5Thinking = "gpt-5.1"
-        case gpt5Chat = "gpt-5.1-chat-latest"
+// MARK: - Claude Configuration
 
-        static let `default`: Model = .gpt5Thinking
+struct ClaudeConfiguration: Sendable {
+    enum Model: String, CaseIterable, Identifiable, Codable {
+        case sonnet4 = "claude-sonnet-4-20250514"
+        case haiku4 = "claude-haiku-4-20250514"
+
+        static let `default`: Model = .sonnet4
 
         var id: String { rawValue }
 
         var displayName: String {
             switch self {
-            case .gpt5Thinking:
-                return "GPT-5.1 (Thinking)"
-            case .gpt5Chat:
-                return "GPT-5.1 Chat (Instant)"
+            case .sonnet4:
+                return "Claude Sonnet 4.5 (Recommended)"
+            case .haiku4:
+                return "Claude Haiku 4 (Fast)"
             }
         }
     }
@@ -27,7 +29,7 @@ struct GPTConfiguration: Sendable {
         self.apiKey = apiKey
         self.model = model
         self.baseURL = baseURL ?? {
-            guard let url = URL(string: "https://api.openai.com/v1") else {
+            guard let url = URL(string: "https://api.anthropic.com/v1") else {
                 fatalError("Invalid default base URL configuration")
             }
             return url
@@ -35,7 +37,9 @@ struct GPTConfiguration: Sendable {
     }
 }
 
-enum GPTServiceError: Error, LocalizedError {
+// MARK: - Service Error
+
+enum ClaudeServiceError: Error, LocalizedError {
     case missingAPIKey
     case invalidResponse
     case serverError(String)
@@ -43,14 +47,16 @@ enum GPTServiceError: Error, LocalizedError {
     var errorDescription: String? {
         switch self {
         case .missingAPIKey:
-            return "Add an OpenAI API key in Settings."
+            return "Add an Anthropic API key in Settings."
         case .invalidResponse:
-            return "Received an unexpected response from GPT-5.1."
+            return "Received an unexpected response from Claude."
         case .serverError(let details):
             return details
         }
     }
 }
+
+// MARK: - Claude Service
 
 actor GPTService {
     private let urlSession: URLSession
@@ -60,32 +66,33 @@ actor GPTService {
     }
 
     func streamCompletion(
-        configuration: GPTConfiguration,
+        configuration: ClaudeConfiguration,
         systemPrompt: String,
         userMessage: String,
         temperature: Double = 0.2,
-        maxTokens: Int = 2048
+        maxTokens: Int = 4096
     ) -> AsyncThrowingStream<String, Error> {
         AsyncThrowingStream { continuation in
             Task {
                 do {
                     let apiKey = configuration.apiKey?.trimmingCharacters(in: .whitespacesAndNewlines)
                     guard let apiKey, !apiKey.isEmpty else {
-                        throw GPTServiceError.missingAPIKey
+                        throw ClaudeServiceError.missingAPIKey
                     }
 
-                    var request = URLRequest(url: configuration.baseURL.appendingPathComponent("chat/completions"))
+                    var request = URLRequest(url: configuration.baseURL.appendingPathComponent("messages"))
                     request.httpMethod = "POST"
                     request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-                    request.addValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
+                    request.addValue(apiKey, forHTTPHeaderField: "x-api-key")
+                    request.addValue("2023-06-01", forHTTPHeaderField: "anthropic-version")
 
                     let payload: [String: Any] = [
                         "model": configuration.model.rawValue,
-                        "stream": true,
+                        "max_tokens": maxTokens,
                         "temperature": temperature,
-                        "max_completion_tokens": maxTokens,
+                        "stream": true,
+                        "system": systemPrompt,
                         "messages": [
-                            ["role": "system", "content": systemPrompt],
                             ["role": "user", "content": userMessage]
                         ]
                     ]
@@ -94,27 +101,33 @@ actor GPTService {
 
                     let (bytes, response) = try await urlSession.bytes(for: request)
                     guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
-                        throw GPTServiceError.invalidResponse
+                        let statusCode = (response as? HTTPURLResponse)?.statusCode ?? -1
+                        throw ClaudeServiceError.serverError("HTTP \(statusCode)")
                     }
 
                     for try await line in bytes.lines {
                         guard line.hasPrefix("data: ") else { continue }
                         let jsonLine = line.dropFirst(6)
-                        if jsonLine == "[DONE]" {
+
+                        // Skip message_stop event
+                        if jsonLine.contains("message_stop") {
                             break
                         }
 
                         guard
                             let data = jsonLine.data(using: .utf8),
-                            let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
-                            let choices = json["choices"] as? [[String: Any]],
-                            let delta = choices.first?["delta"] as? [String: Any],
-                            let content = delta["content"] as? String
+                            let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
                         else {
                             continue
                         }
 
-                        continuation.yield(content)
+                        // Handle content_block_delta events
+                        if let eventType = json["type"] as? String,
+                           eventType == "content_block_delta",
+                           let delta = json["delta"] as? [String: Any],
+                           let text = delta["text"] as? String {
+                            continuation.yield(text)
+                        }
                     }
 
                     continuation.finish()

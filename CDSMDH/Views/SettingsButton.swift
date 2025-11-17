@@ -4,7 +4,7 @@ struct SettingsButton: View {
     @EnvironmentObject private var settings: SecureSettings
     @State private var showingSheet = false
     @State private var apiKey = ""
-    @State private var selectedModel = GPTConfiguration.Model.default
+    @State private var selectedModel = ClaudeConfiguration.Model.default
     @State private var errorMessage: String?
 
     var body: some View {
@@ -18,18 +18,18 @@ struct SettingsButton: View {
         .sheet(isPresented: $showingSheet) {
             NavigationStack {
                 Form {
-                    Section("OpenAI Credentials") {
+                    Section("Anthropic Credentials") {
                         SecureField("API Key", text: $apiKey)
                             .textInputAutocapitalization(.never)
                             .autocorrectionDisabled()
-                        Text("Stored securely using the Keychain. Required for GPT-5.1 access.")
+                        Text("Stored securely using the Keychain. Required for Claude access.")
                             .font(.footnote)
                             .foregroundStyle(.secondary)
                     }
 
                     Section("Model") {
                         Picker("Model", selection: $selectedModel) {
-                            ForEach(GPTConfiguration.Model.allCases) { model in
+                            ForEach(ClaudeConfiguration.Model.allCases) { model in
                                 Text(model.displayName).tag(model)
                             }
                         }

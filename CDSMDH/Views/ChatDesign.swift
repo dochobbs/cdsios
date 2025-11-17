@@ -240,7 +240,7 @@ struct StreamingOutputSection: View {
                     Text("Your response will appear here")
                         .font(LakesBrand.body())
                         .foregroundStyle(.white.opacity(0.8))
-                    Text("Clinical recommendations powered by GPT-5.1")
+                    Text("Clinical recommendations powered by Claude")
                         .font(LakesBrand.caption())
                         .foregroundStyle(.white.opacity(0.6))
                 }

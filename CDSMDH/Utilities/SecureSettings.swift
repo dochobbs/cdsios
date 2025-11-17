@@ -6,10 +6,10 @@ final class SecureSettings: ObservableObject {
     static let shared = SecureSettings()
 
     @Published private(set) var apiKey: String?
-    @Published private(set) var model: GPTConfiguration.Model = .default
+    @Published private(set) var model: ClaudeConfiguration.Model = .default
 
     private let keychainService = "com.dochobbs.clinicalapp"
-    private let apiKeyKey = "openai_api_key"
+    private let apiKeyKey = "anthropic_api_key"
     private let modelKey = "selected_model"
 
     private var cancellables = Set<AnyCancellable>()
@@ -17,12 +17,12 @@ final class SecureSettings: ObservableObject {
     private init() {
         apiKey = readKeychainValue(for: apiKeyKey)
         if let storedModel = UserDefaults.standard.string(forKey: modelKey),
-           let model = GPTConfiguration.Model(rawValue: storedModel) {
+           let model = ClaudeConfiguration.Model(rawValue: storedModel) {
             self.model = model
         }
     }
 
-    func update(apiKey: String, model: GPTConfiguration.Model) throws {
+    func update(apiKey: String, model: ClaudeConfiguration.Model) throws {
         try storeKeychainValue(apiKey, for: apiKeyKey)
         UserDefaults.standard.set(model.rawValue, forKey: modelKey)
 
@@ -32,8 +32,8 @@ final class SecureSettings: ObservableObject {
         }
     }
 
-    func configuration() -> GPTConfiguration {
-        GPTConfiguration(apiKey: apiKey, model: model)
+    func configuration() -> ClaudeConfiguration {
+        ClaudeConfiguration(apiKey: apiKey, model: model)
     }
 
     private func storeKeychainValue(_ value: String, for key: String) throws {
