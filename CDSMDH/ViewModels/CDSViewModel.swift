@@ -135,29 +135,27 @@ final class CDSViewModel: StreamingCommandViewModel {
                     maxTokens: 4096
                 )
 
+                var accumulated = ""
                 for try await chunk in stream {
                     try Task.checkCancellation()
-                    print("DEBUG ViewModel: Received chunk, length: \(chunk.count)")
-                    // Ollama sends full accumulated message, not deltas
+                    print("DEBUG ViewModel: Received chunk: '\(chunk)'")
+                    accumulated.append(chunk)
+                    print("DEBUG ViewModel: Accumulated length now: \(accumulated.count)")
                     await MainActor.run {
-                        print("DEBUG ViewModel: Updating output on MainActor")
-                        self.output = chunk
+                        self.output = accumulated
                         // Update cache in real-time for streaming display
                         switch format {
                         case .full:
-                            self.fullOutput = chunk
-                            print("DEBUG: Updated fullOutput cache")
+                            self.fullOutput = accumulated
                         case .quick:
-                            self.quickOutput = chunk
-                            print("DEBUG: Updated quickOutput cache")
+                            self.quickOutput = accumulated
                         case .parent:
-                            self.parentOutput = chunk
-                            print("DEBUG: Updated parentOutput cache")
+                            self.parentOutput = accumulated
                         }
                     }
                 }
 
-                print("DEBUG ViewModel: Stream completed")
+                print("DEBUG ViewModel: Stream completed, final length: \(accumulated.count)")
 
                 await MainActor.run {
                     self.isStreaming = false

@@ -47,9 +47,8 @@ class StreamingCommandViewModel: ObservableObject {
 
                 for try await chunk in stream {
                     try Task.checkCancellation()
-                    // Ollama sends full accumulated message, not deltas
                     await MainActor.run {
-                        self.output = chunk
+                        self.output.append(chunk)
                     }
                 }
 

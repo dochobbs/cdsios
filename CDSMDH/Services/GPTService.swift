@@ -131,8 +131,7 @@ actor GPTService {
                             break
                         }
 
-                        // Extract message content
-                        // Ollama sends full accumulated message in each chunk, not deltas
+                        // Extract message content (deltas)
                         if let message = json["message"] as? [String: Any],
                            let content = message["content"] as? String,
                            !content.isEmpty {

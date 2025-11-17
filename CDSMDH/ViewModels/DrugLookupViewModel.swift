@@ -138,19 +138,20 @@ final class DrugLookupViewModel: StreamingCommandViewModel {
                     maxTokens: 4096
                 )
 
+                var accumulated = ""
                 for try await chunk in stream {
                     try Task.checkCancellation()
-                    // Ollama sends full accumulated message, not deltas
+                    accumulated.append(chunk)
                     await MainActor.run {
-                        self.output = chunk
+                        self.output = accumulated
                         // Update cache in real-time for streaming display
                         switch format {
                         case .full:
-                            self.fullOutput = chunk
+                            self.fullOutput = accumulated
                         case .quick:
-                            self.quickOutput = chunk
+                            self.quickOutput = accumulated
                         case .parent:
-                            self.parentOutput = chunk
+                            self.parentOutput = accumulated
                         }
                     }
                 }
