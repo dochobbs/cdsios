@@ -1,6 +1,6 @@
 import Foundation
 
-/// Shared GPT streaming plumbing so each clinical command can focus on its inputs.
+/// Shared Claude streaming plumbing so each clinical command can focus on its inputs.
 @MainActor
 class StreamingCommandViewModel: ObservableObject {
     @Published var output: String = ""
@@ -21,7 +21,7 @@ class StreamingCommandViewModel: ObservableObject {
         self.settings = settings
     }
 
-    func stream(userMessage: String, temperature: Double = 0.2, maxTokens: Int = 2048) {
+    func stream(userMessage: String, temperature: Double = 0.2, maxTokens: Int = 4096) {
         guard let template = promptStore.template(for: commandKey) else {
             error = "Prompt template for '\(commandKey)' is missing."
             return
@@ -70,10 +70,10 @@ class StreamingCommandViewModel: ObservableObject {
         isStreaming = false
     }
 
-    private func prepareConfiguration() -> GPTConfiguration? {
+    private func prepareConfiguration() -> ClaudeConfiguration? {
         let configuration = settings.configuration()
         guard let apiKey = configuration.apiKey, !apiKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            error = "Add an OpenAI API key in Settings."
+            error = "Add an Anthropic API key in Settings."
             return nil
         }
         return configuration
