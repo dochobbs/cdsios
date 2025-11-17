@@ -45,10 +45,10 @@ struct DrugLookupView: View {
                                 placeholder: "e.g., 5 years"
                             )
 
-                            VStack(alignment: .leading, spacing: LakesBrand.spacingS) {
+                            VStack(alignment: .leading, spacing: 4) {
                                 Text("Response Format".uppercased())
-                                    .font(LakesBrand.caption())
-                                    .foregroundStyle(.white.opacity(0.7))
+                                    .font(.system(size: 10, weight: .medium))
+                                    .foregroundStyle(.white.opacity(0.5))
 
                                 Picker("Response format", selection: $viewModel.format) {
                                     ForEach(DrugLookupViewModel.ResponseFormat.allCases) { format in
@@ -91,7 +91,8 @@ struct DrugLookupView: View {
                     )
                 }
                 .padding(.horizontal, LakesBrand.spacingM)
-                .padding(.vertical, LakesBrand.spacingM)
+                .padding(.top, LakesBrand.spacingM)
+                .padding(.bottom, 100)
             }
         }
     }
@@ -103,32 +104,32 @@ struct DrugLookupView: View {
         placeholder: String,
         keyboard: UIKeyboardType = .default
     ) -> some View {
-        VStack(alignment: .leading, spacing: LakesBrand.spacingS) {
+        VStack(alignment: .leading, spacing: 4) {
             Text(title.uppercased())
-                .font(LakesBrand.caption())
-                .foregroundStyle(.white.opacity(0.7))
+                .font(.system(size: 10, weight: .medium))
+                .foregroundStyle(.white.opacity(0.5))
 
-            HStack(spacing: LakesBrand.spacingM) {
+            HStack(spacing: LakesBrand.spacingS) {
                 Image(systemName: icon)
-                    .font(LakesBrand.body())
+                    .font(.system(size: 13))
                     .foregroundStyle(LakesBrand.lightBlue)
-                    .frame(width: 24)
+                    .frame(width: 20)
 
                 TextField(placeholder, text: text)
-                    .font(LakesBrand.body())
+                    .font(.system(size: 14))
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled()
                     .keyboardType(keyboard)
                     .foregroundStyle(.white)
             }
-            .padding(LakesBrand.spacingM)
+            .padding(LakesBrand.spacingS)
             .background(
-                RoundedRectangle(cornerRadius: LakesBrand.radiusM, style: .continuous)
+                RoundedRectangle(cornerRadius: LakesBrand.radiusS, style: .continuous)
                     .fill(LakesBrand.darkNavy.opacity(0.3))
             )
             .overlay(
-                RoundedRectangle(cornerRadius: LakesBrand.radiusM, style: .continuous)
-                    .stroke(LakesBrand.lightBlue.opacity(0.2), lineWidth: 1)
+                RoundedRectangle(cornerRadius: LakesBrand.radiusS, style: .continuous)
+                    .stroke(LakesBrand.lightBlue.opacity(0.15), lineWidth: 0.5)
             )
         }
     }

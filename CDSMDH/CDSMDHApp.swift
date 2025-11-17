@@ -58,6 +58,7 @@ struct CDSMDHApp: App {
                 NavigationStack {
                     DrugLookupView(viewModel: drugLookupViewModel)
                         .navigationTitle("Drug Lookup")
+                        .navigationBarTitleDisplayMode(.inline)
                         .toolbar {
                             ToolbarItem(placement: .primaryAction) {
                                 SettingsButton()
@@ -65,12 +66,13 @@ struct CDSMDHApp: App {
                         }
                 }
                 .tabItem {
-                    Label("Medications", systemImage: "pills")
+                    Label("Drug", systemImage: "capsule")
                 }
 
                 NavigationStack {
                     CDSView(viewModel: cdsViewModel)
                         .navigationTitle("CDS")
+                        .navigationBarTitleDisplayMode(.inline)
                         .toolbar {
                             ToolbarItem(placement: .primaryAction) {
                                 SettingsButton()
@@ -78,9 +80,10 @@ struct CDSMDHApp: App {
                         }
                 }
                 .tabItem {
-                    Label("CDS", systemImage: "stethoscope")
+                    Label("Clinical", systemImage: "heart.text.square")
                 }
             }
+            .tint(LakesBrand.lightBlue)
             .environmentObject(settings)
         }
     }

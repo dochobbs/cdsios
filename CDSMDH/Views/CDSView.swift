@@ -16,10 +16,10 @@ struct CDSView: View {
                         icon: "stethoscope"
                     ) {
                         VStack(spacing: LakesBrand.spacingM) {
-                            VStack(alignment: .leading, spacing: LakesBrand.spacingS) {
+                            VStack(alignment: .leading, spacing: 4) {
                                 Text("Clinical Presentation".uppercased())
-                                    .font(LakesBrand.caption())
-                                    .foregroundStyle(.white.opacity(0.7))
+                                    .font(.system(size: 10, weight: .medium))
+                                    .foregroundStyle(.white.opacity(0.5))
 
                                 editorField(
                                     text: $viewModel.presentation,
@@ -28,10 +28,10 @@ struct CDSView: View {
                                 )
                             }
 
-                            VStack(alignment: .leading, spacing: LakesBrand.spacingS) {
+                            VStack(alignment: .leading, spacing: 4) {
                                 Text("Provider Questions (Optional)".uppercased())
-                                    .font(LakesBrand.caption())
-                                    .foregroundStyle(.white.opacity(0.7))
+                                    .font(.system(size: 10, weight: .medium))
+                                    .foregroundStyle(.white.opacity(0.5))
 
                                 editorField(
                                     text: $viewModel.keyConcerns,
@@ -40,10 +40,10 @@ struct CDSView: View {
                                 )
                             }
 
-                            VStack(alignment: .leading, spacing: LakesBrand.spacingS) {
+                            VStack(alignment: .leading, spacing: 4) {
                                 Text("Response Detail".uppercased())
-                                    .font(LakesBrand.caption())
-                                    .foregroundStyle(.white.opacity(0.7))
+                                    .font(.system(size: 10, weight: .medium))
+                                    .foregroundStyle(.white.opacity(0.5))
 
                                 Picker("Response detail", selection: $viewModel.format) {
                                     ForEach(CDSViewModel.ResponseFormat.allCases) { format in
@@ -86,7 +86,8 @@ struct CDSView: View {
                     )
                 }
                 .padding(.horizontal, LakesBrand.spacingM)
-                .padding(.vertical, LakesBrand.spacingM)
+                .padding(.top, LakesBrand.spacingM)
+                .padding(.bottom, 100)
             }
         }
     }
@@ -95,22 +96,22 @@ struct CDSView: View {
         TextField(
             "",
             text: text,
-            prompt: Text(placeholder).foregroundStyle(.white.opacity(0.5)),
+            prompt: Text(placeholder).foregroundStyle(.white.opacity(0.4)),
             axis: .vertical
         )
-        .font(LakesBrand.body())
+        .font(.system(size: 14))
         .lineLimit(2...10)
         .textInputAutocapitalization(.sentences)
-        .padding(LakesBrand.spacingM)
+        .padding(LakesBrand.spacingS)
         .frame(minHeight: minHeight, alignment: .topLeading)
         .foregroundStyle(.white)
         .background(
-            RoundedRectangle(cornerRadius: LakesBrand.radiusM, style: .continuous)
+            RoundedRectangle(cornerRadius: LakesBrand.radiusS, style: .continuous)
                 .fill(LakesBrand.darkNavy.opacity(0.3))
         )
         .overlay(
-            RoundedRectangle(cornerRadius: LakesBrand.radiusM, style: .continuous)
-                .stroke(LakesBrand.lightBlue.opacity(0.2), lineWidth: 1)
+            RoundedRectangle(cornerRadius: LakesBrand.radiusS, style: .continuous)
+                .stroke(LakesBrand.lightBlue.opacity(0.15), lineWidth: 0.5)
         )
     }
 }

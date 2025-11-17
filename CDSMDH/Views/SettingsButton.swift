@@ -13,7 +13,7 @@ struct SettingsButton: View {
             selectedModel = settings.model
             showingSheet = true
         } label: {
-            Image(systemName: "gear")
+            Image(systemName: "ellipsis.circle")
         }
         .sheet(isPresented: $showingSheet) {
             NavigationStack {

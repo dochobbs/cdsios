@@ -68,6 +68,11 @@ enum LakesBrand {
         .system(size: 13, weight: .regular, design: .default)
     }
 
+    /// Response - Monospace for clinical output
+    static func response() -> Font {
+        .system(size: 10, weight: .regular, design: .monospaced)
+    }
+
     // MARK: - Spacing Tokens
 
     static let spacingXS: CGFloat = 4
@@ -127,22 +132,22 @@ struct GlassCard<Content: View>: View {
     var body: some View {
         VStack(alignment: .leading, spacing: LakesBrand.spacingM) {
             if title != nil || subtitle != nil || icon != nil {
-                HStack(alignment: .firstTextBaseline, spacing: LakesBrand.spacingM) {
+                HStack(alignment: .firstTextBaseline, spacing: LakesBrand.spacingS) {
                     if let icon {
                         Image(systemName: icon)
-                            .font(LakesBrand.headline())
+                            .font(.system(size: 14))
                             .foregroundStyle(LakesBrand.lightBlue)
                     }
-                    VStack(alignment: .leading, spacing: LakesBrand.spacingXS) {
+                    VStack(alignment: .leading, spacing: 2) {
                         if let title {
                             Text(title)
-                                .font(LakesBrand.headline())
+                                .font(.system(size: 14, weight: .medium))
                                 .foregroundStyle(.white)
                         }
                         if let subtitle {
                             Text(subtitle)
-                                .font(LakesBrand.caption())
-                                .foregroundStyle(.white.opacity(0.7))
+                                .font(.system(size: 11))
+                                .foregroundStyle(.white.opacity(0.6))
                         }
                     }
                 }
@@ -150,17 +155,13 @@ struct GlassCard<Content: View>: View {
 
             content
         }
-        .padding(LakesBrand.spacingL)
+        .padding(LakesBrand.spacingM)
         .background(
-            RoundedRectangle(cornerRadius: LakesBrand.radiusL, style: .continuous)
-                .fill(.ultraThinMaterial.opacity(0.5))
-                .background(
-                    RoundedRectangle(cornerRadius: LakesBrand.radiusL, style: .continuous)
-                        .fill(LakesBrand.navy.opacity(0.2))
-                )
+            RoundedRectangle(cornerRadius: LakesBrand.radiusM, style: .continuous)
+                .fill(LakesBrand.navy.opacity(0.3))
                 .overlay(
-                    RoundedRectangle(cornerRadius: LakesBrand.radiusL, style: .continuous)
-                        .stroke(LakesBrand.lightBlue.opacity(0.2), lineWidth: 1)
+                    RoundedRectangle(cornerRadius: LakesBrand.radiusM, style: .continuous)
+                        .stroke(LakesBrand.lightBlue.opacity(0.15), lineWidth: 0.5)
                 )
         )
     }
@@ -173,27 +174,15 @@ struct PrimaryActionButtonStyle: ButtonStyle {
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(LakesBrand.headline())
+            .font(.system(size: 14, weight: .medium))
             .frame(maxWidth: .infinity)
-            .padding(.vertical, LakesBrand.spacingM)
+            .padding(.vertical, 12)
             .background(
-                Group {
-                    if isDestructive {
-                        RoundedRectangle(cornerRadius: LakesBrand.radiusM, style: .continuous)
-                            .fill(Color.red)
-                    } else {
-                        RoundedRectangle(cornerRadius: LakesBrand.radiusM, style: .continuous)
-                            .fill(LakesBrand.accentGradient)
-                    }
-                }
-                .opacity(configuration.isPressed ? 0.8 : 1)
+                RoundedRectangle(cornerRadius: LakesBrand.radiusS, style: .continuous)
+                    .fill(isDestructive ? Color.red.opacity(0.8) : LakesBrand.lightBlue)
+                    .opacity(configuration.isPressed ? 0.7 : 1)
             )
             .foregroundStyle(.white)
-            .shadow(
-                color: (isDestructive ? Color.red : LakesBrand.lightBlue).opacity(0.3),
-                radius: 12,
-                y: 6
-            )
     }
 }
 
@@ -236,28 +225,25 @@ struct StreamingOutputSection: View {
             icon: "bubble.left.and.bubble.right.fill"
         ) {
             if output.isEmpty {
-                VStack(alignment: .leading, spacing: LakesBrand.spacingS) {
-                    Text("Your response will appear here")
-                        .font(LakesBrand.body())
-                        .foregroundStyle(.white.opacity(0.8))
-                    Text("Clinical recommendations powered by Claude")
-                        .font(LakesBrand.caption())
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Response will appear here")
+                        .font(.system(size: 12))
                         .foregroundStyle(.white.opacity(0.6))
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(LakesBrand.spacingL)
+                .padding(LakesBrand.spacingM)
                 .background(
-                    RoundedRectangle(cornerRadius: LakesBrand.radiusM, style: .continuous)
-                        .fill(LakesBrand.darkNavy.opacity(0.3))
+                    RoundedRectangle(cornerRadius: LakesBrand.radiusS, style: .continuous)
+                        .fill(LakesBrand.darkNavy.opacity(0.2))
                 )
             } else {
                 ScrollView {
                     Text(output)
-                        .font(LakesBrand.body())
+                        .font(LakesBrand.response())
                         .foregroundStyle(.white)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .textSelection(.enabled)
-                        .padding(LakesBrand.spacingL)
+                        .padding(LakesBrand.spacingM)
                 }
                 .frame(minHeight: 200)
                 .background(
