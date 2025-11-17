@@ -1,22 +1,28 @@
 import Foundation
 
-// MARK: - Claude Configuration
+// MARK: - Ollama Configuration
 
-struct ClaudeConfiguration: Sendable {
+struct OllamaConfiguration: Sendable {
     enum Model: String, CaseIterable, Identifiable, Codable {
-        case sonnet45 = "claude-sonnet-4-5-20250929"
-        case haiku45 = "claude-haiku-4-5-20251001"
+        case kimiK2Thinking = "kimi-k2-thinking"
+        case kimiK2 = "kimi-k2"
+        case deepseekV3 = "deepseek-v3.1:671b"
+        case gptOss = "gpt-oss:120b"
 
-        static let `default`: Model = .sonnet45
+        static let `default`: Model = .kimiK2Thinking
 
         var id: String { rawValue }
 
         var displayName: String {
             switch self {
-            case .sonnet45:
-                return "Claude Sonnet 4.5 (Recommended)"
-            case .haiku45:
-                return "Claude Haiku 4.5 (Fast)"
+            case .kimiK2Thinking:
+                return "Kimi K2 Thinking (Recommended)"
+            case .kimiK2:
+                return "Kimi K2"
+            case .deepseekV3:
+                return "DeepSeek V3.1 (671B)"
+            case .gptOss:
+                return "GPT-OSS (120B)"
             }
         }
     }
@@ -29,7 +35,7 @@ struct ClaudeConfiguration: Sendable {
         self.apiKey = apiKey
         self.model = model
         self.baseURL = baseURL ?? {
-            guard let url = URL(string: "https://api.anthropic.com/v1") else {
+            guard let url = URL(string: "https://ollama.com/api") else {
                 fatalError("Invalid default base URL configuration")
             }
             return url
@@ -39,7 +45,7 @@ struct ClaudeConfiguration: Sendable {
 
 // MARK: - Service Error
 
-enum ClaudeServiceError: Error, LocalizedError {
+enum OllamaServiceError: Error, LocalizedError {
     case missingAPIKey
     case invalidResponse
     case serverError(String)
@@ -47,16 +53,16 @@ enum ClaudeServiceError: Error, LocalizedError {
     var errorDescription: String? {
         switch self {
         case .missingAPIKey:
-            return "Add an Anthropic API key in Settings."
+            return "Add an Ollama API key in Settings."
         case .invalidResponse:
-            return "Received an unexpected response from Claude."
+            return "Received an unexpected response from Ollama."
         case .serverError(let details):
             return details
         }
     }
 }
 
-// MARK: - Claude Service
+// MARK: - Ollama Service
 
 actor GPTService {
     private let urlSession: URLSession
@@ -66,7 +72,7 @@ actor GPTService {
     }
 
     func streamCompletion(
-        configuration: ClaudeConfiguration,
+        configuration: OllamaConfiguration,
         systemPrompt: String,
         userMessage: String,
         temperature: Double = 0.2,
@@ -77,23 +83,24 @@ actor GPTService {
                 do {
                     let apiKey = configuration.apiKey?.trimmingCharacters(in: .whitespacesAndNewlines)
                     guard let apiKey, !apiKey.isEmpty else {
-                        throw ClaudeServiceError.missingAPIKey
+                        throw OllamaServiceError.missingAPIKey
                     }
 
-                    var request = URLRequest(url: configuration.baseURL.appendingPathComponent("messages"))
+                    var request = URLRequest(url: configuration.baseURL.appendingPathComponent("chat"))
                     request.httpMethod = "POST"
                     request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-                    request.addValue(apiKey, forHTTPHeaderField: "x-api-key")
-                    request.addValue("2023-06-01", forHTTPHeaderField: "anthropic-version")
+                    request.addValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
 
                     let payload: [String: Any] = [
                         "model": configuration.model.rawValue,
-                        "max_tokens": maxTokens,
-                        "temperature": temperature,
-                        "stream": true,
-                        "system": systemPrompt,
                         "messages": [
+                            ["role": "system", "content": systemPrompt],
                             ["role": "user", "content": userMessage]
+                        ],
+                        "stream": true,
+                        "options": [
+                            "temperature": temperature,
+                            "num_predict": maxTokens
                         ]
                     ]
 
@@ -102,31 +109,28 @@ actor GPTService {
                     let (bytes, response) = try await urlSession.bytes(for: request)
                     guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
                         let statusCode = (response as? HTTPURLResponse)?.statusCode ?? -1
-                        throw ClaudeServiceError.serverError("HTTP \(statusCode)")
+                        throw OllamaServiceError.serverError("HTTP \(statusCode)")
                     }
 
                     for try await line in bytes.lines {
-                        guard line.hasPrefix("data: ") else { continue }
-                        let jsonLine = line.dropFirst(6)
-
-                        // Skip message_stop event
-                        if jsonLine.contains("message_stop") {
-                            break
-                        }
+                        guard !line.isEmpty else { continue }
 
                         guard
-                            let data = jsonLine.data(using: .utf8),
+                            let data = line.data(using: .utf8),
                             let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
                         else {
                             continue
                         }
 
-                        // Handle content_block_delta events
-                        if let eventType = json["type"] as? String,
-                           eventType == "content_block_delta",
-                           let delta = json["delta"] as? [String: Any],
-                           let text = delta["text"] as? String {
-                            continuation.yield(text)
+                        // Check if done
+                        if let done = json["done"] as? Bool, done {
+                            break
+                        }
+
+                        // Extract message content
+                        if let message = json["message"] as? [String: Any],
+                           let content = message["content"] as? String {
+                            continuation.yield(content)
                         }
                     }
 

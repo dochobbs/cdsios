@@ -70,10 +70,10 @@ class StreamingCommandViewModel: ObservableObject {
         isStreaming = false
     }
 
-    internal func prepareConfiguration() -> ClaudeConfiguration? {
+    internal func prepareConfiguration() -> OllamaConfiguration? {
         let configuration = settings.configuration()
         guard let apiKey = configuration.apiKey, !apiKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            error = "Add an Anthropic API key in Settings."
+            error = "Add an Ollama API key in Settings."
             return nil
         }
         return configuration
