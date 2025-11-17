@@ -23,10 +23,15 @@ struct GPTConfiguration: Sendable {
     var model: Model
     var baseURL: URL
 
-    init(apiKey: String? = nil, model: Model = .default, baseURL: URL = URL(string: "https://api.openai.com/v1")!) {
+    init(apiKey: String? = nil, model: Model = .default, baseURL: URL? = nil) {
         self.apiKey = apiKey
         self.model = model
-        self.baseURL = baseURL
+        self.baseURL = baseURL ?? {
+            guard let url = URL(string: "https://api.openai.com/v1") else {
+                fatalError("Invalid default base URL configuration")
+            }
+            return url
+        }()
     }
 }
 

@@ -1,4 +1,5 @@
 import Foundation
+import os.log
 
 struct PromptTemplate: Identifiable, Codable {
     var id: UUID = UUID()
@@ -26,6 +27,7 @@ struct PromptTemplate: Identifiable, Codable {
 @MainActor
 final class PromptStore: ObservableObject {
     static let shared = PromptStore()
+    private let logger = Logger(subsystem: "com.dochobbs.clinicalapp", category: "PromptStore")
 
     @Published private(set) var templates: [String: PromptTemplate] = [:]
 
@@ -50,7 +52,7 @@ final class PromptStore: ObservableObject {
                 let template = try JSONDecoder().decode(PromptTemplate.self, from: data)
                 loaded[template.command] = template
             } catch {
-                print("Failed to load prompt from \(file.lastPathComponent): \(error)")
+                logger.error("Failed to load prompt from \(file.lastPathComponent, privacy: .public): \(error.localizedDescription, privacy: .public)")
             }
         }
 
