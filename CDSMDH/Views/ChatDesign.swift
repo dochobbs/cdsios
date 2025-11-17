@@ -177,9 +177,16 @@ struct PrimaryActionButtonStyle: ButtonStyle {
             .frame(maxWidth: .infinity)
             .padding(.vertical, LakesBrand.spacingM)
             .background(
-                RoundedRectangle(cornerRadius: LakesBrand.radiusM, style: .continuous)
-                    .fill(isDestructive ? Color.red : LakesBrand.accentGradient)
-                    .opacity(configuration.isPressed ? 0.8 : 1)
+                Group {
+                    if isDestructive {
+                        RoundedRectangle(cornerRadius: LakesBrand.radiusM, style: .continuous)
+                            .fill(Color.red)
+                    } else {
+                        RoundedRectangle(cornerRadius: LakesBrand.radiusM, style: .continuous)
+                            .fill(LakesBrand.accentGradient)
+                    }
+                }
+                .opacity(configuration.isPressed ? 0.8 : 1)
             )
             .foregroundStyle(.white)
             .shadow(
