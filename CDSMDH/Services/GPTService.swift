@@ -4,8 +4,8 @@ import Foundation
 
 struct ClaudeConfiguration: Sendable {
     enum Model: String, CaseIterable, Identifiable, Codable {
-        case sonnet45 = "claude-4-5-sonnet-20241022"
-        case haiku4 = "claude-4-haiku-20241022"
+        case sonnet45 = "claude-sonnet-4-5-20250929"
+        case haiku45 = "claude-haiku-4-5-20251001"
 
         static let `default`: Model = .sonnet45
 
@@ -15,8 +15,8 @@ struct ClaudeConfiguration: Sendable {
             switch self {
             case .sonnet45:
                 return "Claude Sonnet 4.5 (Recommended)"
-            case .haiku4:
-                return "Claude Haiku 4 (Fast)"
+            case .haiku45:
+                return "Claude Haiku 4.5 (Fast)"
             }
         }
     }
