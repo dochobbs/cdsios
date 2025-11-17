@@ -53,6 +53,9 @@ struct CDSView: View {
                                 .pickerStyle(.segmented)
                                 .background(LakesBrand.darkNavy.opacity(0.3))
                                 .cornerRadius(LakesBrand.radiusS)
+                                .onChange(of: viewModel.format) { newFormat in
+                                    viewModel.toggleFormat(to: newFormat)
+                                }
                             }
 
                             Button(viewModel.isStreaming ? "Cancel Request" : "Generate Clinical Summary") {
