@@ -4,7 +4,7 @@ struct SettingsButton: View {
     @EnvironmentObject private var settings: SecureSettings
     @State private var showingSheet = false
     @State private var apiKey = ""
-    @State private var selectedModel = ClaudeConfiguration.Model.default
+    @State private var selectedModel = OllamaConfiguration.Model.default
     @State private var errorMessage: String?
 
     var body: some View {
@@ -18,18 +18,18 @@ struct SettingsButton: View {
         .sheet(isPresented: $showingSheet) {
             NavigationStack {
                 Form {
-                    Section("Anthropic Credentials") {
+                    Section("Ollama Credentials") {
                         SecureField("API Key", text: $apiKey)
                             .textInputAutocapitalization(.never)
                             .autocorrectionDisabled()
-                        Text("Stored securely using the Keychain. Required for Claude access.")
+                        Text("Stored securely using the Keychain. Required for Ollama Cloud access.")
                             .font(.footnote)
                             .foregroundStyle(.secondary)
                     }
 
                     Section("Model") {
                         Picker("Model", selection: $selectedModel) {
-                            ForEach(ClaudeConfiguration.Model.allCases) { model in
+                            ForEach(OllamaConfiguration.Model.allCases) { model in
                                 Text(model.displayName).tag(model)
                             }
                         }

@@ -114,14 +114,14 @@ final class DrugLookupViewModel: StreamingCommandViewModel {
         // Override the output to cache properly
         streamingTask = Task { [weak self] in
             guard let self else { return }
-            guard let template = promptStore.template(for: commandKey) else {
+            guard let template = self.promptStore.template(for: self.commandKey) else {
                 await MainActor.run {
-                    self.error = "Prompt template for '\(commandKey)' is missing."
+                    self.error = "Prompt template for '\(self.commandKey)' is missing."
                 }
                 return
             }
 
-            guard let configuration = prepareConfiguration() else { return }
+            guard let configuration = self.prepareConfiguration() else { return }
 
             await MainActor.run {
                 self.error = nil
