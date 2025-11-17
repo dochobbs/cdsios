@@ -7,7 +7,6 @@
 
 /* Begin PBXBuildFile section */
 		E4F7B1202D7F4B4600A7E1A2 /* CDSMDHApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4F7B1102D7F4B4600A7E1A2 /* CDSMDHApp.swift */; };
-		E4F7B1212D7F4B4600A7E1A2 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4F7B1112D7F4B4600A7E1A2 /* ContentView.swift */; };
 		E4F7B1222D7F4B4600A7E1A2 /* GPTService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4F7B1122D7F4B4600A7E1A2 /* GPTService.swift */; };
 		E4F7B1232D7F4B4600A7E1A2 /* PromptTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4F7B1132D7F4B4600A7E1A2 /* PromptTemplate.swift */; };
 		E4F7B1242D7F4B4600A7E1A2 /* DrugLookupViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4F7B1142D7F4B4600A7E1A2 /* DrugLookupViewModel.swift */; };
@@ -25,7 +24,6 @@
 
 /* Begin PBXFileReference section */
 		E4F7B1102D7F4B4600A7E1A2 /* CDSMDHApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CDSMDHApp.swift; sourceTree = "<group>"; };
-		E4F7B1112D7F4B4600A7E1A2 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		E4F7B1122D7F4B4600A7E1A2 /* GPTService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GPTService.swift; sourceTree = "<group>"; };
 		E4F7B1132D7F4B4600A7E1A2 /* PromptTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptTemplate.swift; sourceTree = "<group>"; };
 		E4F7B1142D7F4B4600A7E1A2 /* DrugLookupViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrugLookupViewModel.swift; sourceTree = "<group>"; };
@@ -74,7 +72,6 @@
 			isa = PBXGroup;
 			children = (
 				E4F7B1102D7F4B4600A7E1A2 /* CDSMDHApp.swift */,
-				E4F7B1112D7F4B4600A7E1A2 /* ContentView.swift */,
 				E4F7B11E2D7F4B4600A7E1A2 /* Models */,
 				E4F7B11F2D7F4B4600A7E1A2 /* ViewModels */,
 				E4F7B2102D7F4B4600A7E1A2 /* Views */,
@@ -219,7 +216,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				E4F7B1202D7F4B4600A7E1A2 /* CDSMDHApp.swift in Sources */,
-				E4F7B1212D7F4B4600A7E1A2 /* ContentView.swift in Sources */,
 				E4F7B1222D7F4B4600A7E1A2 /* GPTService.swift in Sources */,
 				E4F7B1232D7F4B4600A7E1A2 /* PromptTemplate.swift in Sources */,
 				E4F7B1242D7F4B4600A7E1A2 /* DrugLookupViewModel.swift in Sources */,
